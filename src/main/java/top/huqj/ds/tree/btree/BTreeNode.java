@@ -40,7 +40,7 @@ public class BTreeNode<T> {
                 keys[i] = keys[i - 1];
             }
             keys[index] = data;
-            if (!isLeaf) {  //如果不是叶子节点还需要移动孩子节点
+            if (!isLeaf) {  //如果不是叶子节点还需要移动孩子指针
                 for (int i = keyNum + 1; i > index; i--) {
                     children[i] = children[i - 1];
                 }
@@ -137,4 +137,5 @@ public class BTreeNode<T> {
                 "keys=" + Arrays.toString(keys) +
                 '}';
     }
+
 }

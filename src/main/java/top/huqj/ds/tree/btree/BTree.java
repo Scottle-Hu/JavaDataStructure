@@ -30,7 +30,7 @@ public class BTree<T> {
         BTreeNode<T> now = root, parent = null;
         Comparable<T> key2 = (Comparable<T>) key;
         BTreeSearchResult ret = new BTreeSearchResult();
-        boolean shouldContinue = false;
+        boolean shouldContinue;
         while (now != null) {
             shouldContinue = false;
             for (int i = 0; i < now.keyNum; i++) {
@@ -68,6 +68,12 @@ public class BTree<T> {
         return ret;
     }
 
+    /**
+     * 插入一个数据
+     *
+     * @param data
+     * @return
+     */
     public boolean insert(T data) {
         BTreeSearchResult result = find(data);
         if (result.found) {
@@ -79,6 +85,21 @@ public class BTree<T> {
         while (root.parent != null) {
             root = root.parent;
         }
+        return true;
+    }
+
+    /**
+     * 删除一个数据
+     *
+     * @param data
+     * @return
+     */
+    public boolean delete(T data) {
+        BTreeSearchResult result = find(data);
+        if (!result.found) {
+            return false;
+        }
+
         return true;
     }
 
@@ -98,4 +119,5 @@ public class BTree<T> {
         }
         return "BTree {" + sb.toString() + "}";
     }
+
 }
