@@ -13,4 +13,7 @@ public class BTreeSearchResult {
     //关键字的下标
     public int index;
 
+    //是否找到，如果没找到则返回最后一个查找失败的节点便于后面插入
+    public boolean found;
+
 }

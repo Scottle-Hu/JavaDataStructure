@@ -1,7 +1,7 @@
 package top.huqj.ds.tree.btree;
 
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * B-树结构
@@ -26,31 +26,76 @@ public class BTree<T> {
      * @param key
      * @return
      */
-    public Optional<BTreeSearchResult> find(T key) {
-        BTreeNode<T> now = root;
+    public BTreeSearchResult find(T key) {
+        BTreeNode<T> now = root, parent = null;
         Comparable<T> key2 = (Comparable<T>) key;
         BTreeSearchResult ret = new BTreeSearchResult();
         boolean shouldContinue = false;
         while (now != null) {
+            shouldContinue = false;
             for (int i = 0; i < now.keyNum; i++) {
                 int result = key2.compareTo(now.keys[i]);
                 if (result <= 0) {
                     if (result == 0) {  //found
                         ret.node = now;
                         ret.index = i;
-                        return Optional.of(ret);
+                        ret.found = true;
+                        return ret;
                     } else {  //to child
+                        parent = now;
+                        ret.index = i;
                         now = now.children[i];
                         shouldContinue = true;
                         break;
                     }
                 }
             }
-            if (!shouldContinue) {
-                now = now.children[now.children.length - 1];
+            if (shouldContinue) {
+                continue;
+            }
+            if (now.keyNum > 0) {
+                parent = now;
+                ret.index = now.keyNum;
+                now = now.children[now.keyNum];
+            } else {  //初始情况，没有数据
+                parent = now;
+                ret.index = 0;
+                break;
             }
         }
-        return Optional.empty();
+        ret.found = false;
+        ret.node = parent;
+        return ret;
     }
 
+    public boolean insert(T data) {
+        BTreeSearchResult result = find(data);
+        if (result.found) {
+            return false;
+        }
+        BTreeNode<T> node = result.node;
+        node.insertKey(result.index, data);
+        //检查根节点是否改变
+        while (root.parent != null) {
+            root = root.parent;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Queue<BTreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            BTreeNode node = queue.poll();
+            sb.append(node);
+            for (int i = 0; i <= node.keyNum; i++) {
+                if (node.children[i] != null) {
+                    queue.offer(node.children[i]);
+                }
+            }
+        }
+        return "BTree {" + sb.toString() + "}";
+    }
 }
