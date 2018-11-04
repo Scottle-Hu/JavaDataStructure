@@ -33,6 +33,13 @@ public class BTreeNode<T> {
         parent = null;
     }
 
+    /**
+     * 在节点插入一个数据，如果需要分裂则递归插入
+     *
+     * @param index
+     * @param data
+     * @return
+     */
     public InsertResult insertKey(int index, T data) {
         InsertResult insertResult = new InsertResult();
         if (keyNum < keys.length) {
@@ -125,6 +132,109 @@ public class BTreeNode<T> {
             }
         }
         return insertResult;
+    }
+
+    /**
+     * 删除该节点某个索引的数据
+     *
+     * @param index
+     */
+    public void delete(int index) {
+        BTreeNode deleteNode = this;
+        if (isLeaf) {
+            //叶子节点直接删除
+            for (int i = index; i < keyNum - 1; i++) {
+                keys[i] = keys[i + 1];
+            }
+            keyNum--;
+        } else {
+            //非叶子节点用右边最小元素代替
+            while (deleteNode.children[0] != null) {
+                deleteNode = deleteNode.children[0];
+            }
+            keys[index] = (T) deleteNode.keys[0];
+            //删除叶子节点数据
+            deleteNode.delete(0);
+        }
+        deleteNode.merge();
+    }
+
+    /**
+     * 删除之后的合并操作
+     */
+    private void merge() {
+        if (parent == null) {
+            //根节点无需合并
+            return;
+        }
+        int least = (int) Math.ceil(children.length / 2.0) - 1;
+        if (keyNum >= least) {
+            return;
+        }
+        Comparable<T> min = (Comparable<T>) keys[0];
+        //找到左右兄弟节点
+        BTreeNode left = null, right = null;
+        int index = -1;
+        for (int i = 0; i < parent.keyNum; i++) {
+            if (min.compareTo(parent.keys[i]) < 0) {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) {
+            index = parent.keyNum;
+        }
+        if (index != 0) {
+            left = parent.children[index - 1];
+        }
+        if (index != keyNum) {
+            right = parent.children[index + 1];
+        }
+        if (right != null && right.keyNum > least) {
+            //旋转右兄弟最小元素
+            T rightMin = (T) right.keys[0];
+            right.delete(0);
+            T parentData = parent.keys[index];
+            parent.keys[index] = rightMin;
+            insertKey(keyNum, parentData);
+
+        } else if (left != null && left.keyNum > least) {
+            //旋转左兄弟最大元素
+            T leftMax = (T) left.keys[left.keyNum - 1];
+            left.delete(left.keyNum - 1);
+            T parentData = parent.keys[index - 1];
+            parent.keys[index - 1] = leftMax;
+            insertKey(0, parentData);
+        } else {
+            //合并
+            if (right != null) {
+                right.insertKey(0, parent.keys[index]);
+                for (int i = keyNum - 1; i >= 0; i--) {
+                    right.insertKey(0, keys[i]);
+                }
+                for (int i = index; i < parent.keyNum - 1; i++) {
+                    parent.keys[i] = parent.keys[i + 1];
+                }
+                for (int i = index; i < parent.keyNum; i++) {
+                    parent.children[i] = parent.children[i + 1];
+                }
+                parent.keyNum--;
+                parent.merge();
+            } else {
+                left.insertKey(left.keyNum, parent.keys[index - 1]);
+                for (int i = 0; i < keyNum; i++) {
+                    left.insertKey(left.keyNum, keys[i]);
+                }
+                for (int i = index; i < parent.keyNum - 1; i++) {
+                    parent.keys[i] = parent.keys[i + 1];
+                }
+                for (int i = index; i < parent.keyNum; i++) {
+                    parent.children[i] = parent.children[i + 1];
+                }
+                parent.keyNum--;
+                parent.merge();
+            }
+        }
     }
 
     @Override

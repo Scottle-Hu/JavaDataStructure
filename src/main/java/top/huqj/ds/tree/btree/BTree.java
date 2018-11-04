@@ -99,7 +99,7 @@ public class BTree<T> {
         if (!result.found) {
             return false;
         }
-
+        result.node.delete(result.index);
         return true;
     }
 
