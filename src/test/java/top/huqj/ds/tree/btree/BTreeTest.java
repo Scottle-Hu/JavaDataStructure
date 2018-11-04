@@ -54,4 +54,42 @@ public class BTreeTest {
         assert !tree.find(14).found;
     }
 
+    @Test
+    public void testDelete() {
+        testCreateBTree();
+        tree.delete(50);
+        System.out.println("删除50\n" + tree);
+        tree.delete(40);
+        System.out.println("删除40\n" + tree);
+        tree.delete(11);
+        System.out.println("删除11\n" + tree);
+        tree.delete(10);
+        System.out.println("删除10\n" + tree);
+        tree.delete(12);
+        System.out.println("删除12\n" + tree);
+        tree.delete(1);
+        System.out.println("删除1\n" + tree);
+        tree.delete(10);
+        System.out.println("删除10\n" + tree);
+        tree.delete(5);
+        System.out.println("删除5\n" + tree);
+        tree.delete(2);
+        System.out.println("删除2\n" + tree);
+        tree.delete(20);
+        System.out.println("删除20\n" + tree);
+        tree.delete(7);
+        System.out.println("删除7\n" + tree);
+        tree.delete(6);
+        System.out.println("删除6\n" + tree);
+        tree.delete(0);
+        System.out.println("删除0\n" + tree);
+        tree.delete(4);
+        System.out.println("删除4\n" + tree);
+        tree.delete(13);
+        System.out.println("删除13\n" + tree);
+        tree.delete(3);
+        System.out.println("删除3\n" + tree);
+        assert tree.isEmpty();
+    }
+
 }

@@ -100,7 +100,16 @@ public class BTree<T> {
             return false;
         }
         result.node.delete(result.index);
+        //检查根节点是否被合并到子节点了
+        if (root.keyNum == 0 && root.children[0] != null) {
+            root = root.children[0];
+            root.parent = null;
+        }
         return true;
+    }
+
+    public boolean isEmpty() {
+        return root == null || root.keyNum == 0;
     }
 
     @Override

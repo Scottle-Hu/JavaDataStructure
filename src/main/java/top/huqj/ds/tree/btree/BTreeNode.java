@@ -146,9 +146,12 @@ public class BTreeNode<T> {
             for (int i = index; i < keyNum - 1; i++) {
                 keys[i] = keys[i + 1];
             }
+            keys[keyNum - 1] = null;
             keyNum--;
+            deleteNode.merge();
         } else {
             //非叶子节点用右边最小元素代替
+            deleteNode = deleteNode.children[index + 1];
             while (deleteNode.children[0] != null) {
                 deleteNode = deleteNode.children[0];
             }
@@ -156,7 +159,6 @@ public class BTreeNode<T> {
             //删除叶子节点数据
             deleteNode.delete(0);
         }
-        deleteNode.merge();
     }
 
     /**
@@ -184,10 +186,10 @@ public class BTreeNode<T> {
         if (index == -1) {
             index = parent.keyNum;
         }
-        if (index != 0) {
+        if (index > 0) {
             left = parent.children[index - 1];
         }
-        if (index != keyNum) {
+        if (index < parent.keyNum) {
             right = parent.children[index + 1];
         }
         if (right != null && right.keyNum > least) {
@@ -215,9 +217,11 @@ public class BTreeNode<T> {
                 for (int i = index; i < parent.keyNum - 1; i++) {
                     parent.keys[i] = parent.keys[i + 1];
                 }
+                parent.keys[parent.keyNum - 1] = null;
                 for (int i = index; i < parent.keyNum; i++) {
                     parent.children[i] = parent.children[i + 1];
                 }
+                parent.children[parent.keyNum] = null;
                 parent.keyNum--;
                 parent.merge();
             } else {
@@ -228,9 +232,11 @@ public class BTreeNode<T> {
                 for (int i = index; i < parent.keyNum - 1; i++) {
                     parent.keys[i] = parent.keys[i + 1];
                 }
+                parent.keys[parent.keyNum - 1] = null;
                 for (int i = index; i < parent.keyNum; i++) {
                     parent.children[i] = parent.children[i + 1];
                 }
+                parent.children[parent.keyNum] = null;
                 parent.keyNum--;
                 parent.merge();
             }
